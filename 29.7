@@ -1,0 +1,23 @@
+void FineGrainedQueue::insertIntoMiddle(int value, int pos) {
+  // Создаем новый узел
+  Node* newNode = new Node;
+  newNode->value = value;
+  
+  // Захватываем блокировку списка
+  std::lock_guard<std::mutex> listLock(*queue_mutex);
+  
+  // Идем по списку и находим узел на позиции pos-1
+  Node* currentNode = head;
+  int currentPos = 0;
+  while (currentNode->next != nullptr && currentPos < pos-1) {
+    currentNode = currentNode->next;
+    currentPos++;
+  }
+  
+  // Вставляем новый узел после найденного узла
+  newNode->next = currentNode->next;
+  currentNode->next = newNode;
+  
+  // Создаем новую мелкогранулярную блокировку для нового узла
+  newNode->node_mutex = new std::mutex;
+}
